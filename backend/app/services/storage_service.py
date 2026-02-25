@@ -8,7 +8,7 @@ from app.schemas.vision import VisionUploadResponse
 
 
 class StorageService:
-    def __init__(self, upload_root: str = "tmp_uploads") -> None:
+    def __init__(self, upload_root: str = "/tmp/visionary_uploads") -> None:
         self.upload_root = Path(upload_root)
         self.upload_root.mkdir(parents=True, exist_ok=True)
 
