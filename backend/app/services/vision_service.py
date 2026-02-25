@@ -2,7 +2,7 @@ from datetime import datetime, UTC
 from uuid import uuid4
 
 from app.core.config import Settings, get_settings
-from app.core.errors import InvalidInputError
+from app.core.errors import InvalidInputError, ServiceUnavailableError
 from app.integrations.openai_vision_client import OpenAIVisionClient
 from app.schemas.vision import (
     VisionAnalyzeRequest,
@@ -64,16 +64,19 @@ class VisionService:
 
     async def _resolve_summary(self, payload: VisionAnalyzeRequest, detections_count: int) -> str:
         if self._openai_client is not None:
-            ai_result = await self._openai_client.analyze_media(
-                media_type=payload.media_type,
-                prompt=payload.prompt,
-                source_uri=payload.source_uri,
-            )
-            if ai_result.summary.strip():
-                return ai_result.summary
-
-            if not self._settings.openai_fallback_to_stub:
-                raise InvalidInputError("AI provider returned empty summary.")
+            try:
+                ai_result = await self._openai_client.analyze_media(
+                    media_type=payload.media_type,
+                    prompt=payload.prompt,
+                    source_uri=payload.source_uri,
+                )
+                if ai_result.summary.strip():
+                    return ai_result.summary
+                if not self._settings.openai_fallback_to_stub:
+                    raise ServiceUnavailableError("AI provider returned empty summary.")
+            except Exception as exc:
+                if not self._settings.openai_fallback_to_stub:
+                    raise ServiceUnavailableError("AI provider request failed.") from exc
 
         return (
             f"Processed {payload.media_type} input with {detections_count} detected scene elements. "
