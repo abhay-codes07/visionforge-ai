@@ -3,9 +3,11 @@ from typing import Literal
 from fastapi import APIRouter, Depends, File, Form, UploadFile
 
 from app.api.deps import get_vision_service
+from app.core.config import get_settings
 from app.schemas.vision import (
     VisionAnalyzeRequest,
     VisionAnalyzeResponse,
+    VisionCapabilitiesResponse,
     VisionQuestionRequest,
     VisionQuestionResponse,
     VisionUploadResponse,
@@ -15,6 +17,7 @@ from app.services.vision_service import VisionService
 
 router = APIRouter(prefix="/vision")
 storage_service = StorageService()
+settings = get_settings()
 
 
 @router.post("/analyze", response_model=VisionAnalyzeResponse)
@@ -23,6 +26,16 @@ async def analyze_vision(
     service: VisionService = Depends(get_vision_service),
 ) -> VisionAnalyzeResponse:
     return await service.analyze(payload)
+
+
+@router.get("/capabilities", response_model=VisionCapabilitiesResponse)
+async def get_vision_capabilities() -> VisionCapabilitiesResponse:
+    return VisionCapabilitiesResponse(
+        supported_media_types=["image", "video", "webcam"],
+        supported_transports=["rest", "websocket"],
+        supports_streaming=True,
+        model=settings.openai_model,
+    )
 
 
 @router.post("/question", response_model=VisionQuestionResponse)

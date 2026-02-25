@@ -45,3 +45,10 @@ class VisionUploadResponse(BaseModel):
     size_bytes: int
     storage_uri: str
     uploaded_at: datetime
+
+
+class VisionCapabilitiesResponse(BaseModel):
+    supported_media_types: list[MediaType]
+    supported_transports: list[str]
+    supports_streaming: bool
+    model: str

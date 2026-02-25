@@ -18,6 +18,19 @@ def test_analyze_route_returns_summary_and_detections() -> None:
     assert isinstance(payload["detections"], list) and payload["detections"]
 
 
+def test_capabilities_route_returns_supported_contract() -> None:
+    client = TestClient(app)
+
+    response = client.get("/api/v1/vision/capabilities")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["supports_streaming"] is True
+    assert "image" in payload["supported_media_types"]
+    assert "websocket" in payload["supported_transports"]
+    assert isinstance(payload["model"], str) and payload["model"]
+
+
 def test_question_route_rejects_blank_question() -> None:
     client = TestClient(app)
 
