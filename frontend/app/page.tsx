@@ -1,5 +1,6 @@
 import { FeaturedSection } from "@/components/home/featured";
 import { HeroSection } from "@/components/home/hero";
+import { TestimonialsSection } from "@/components/home/testimonials";
 import { Navbar } from "@/components/layout/navbar";
 
 export default function HomePage() {
@@ -8,6 +9,7 @@ export default function HomePage() {
       <Navbar />
       <HeroSection />
       <FeaturedSection />
+      <TestimonialsSection />
     </main>
   );
 }
