@@ -75,7 +75,7 @@ class VisionService:
                 if not self._settings.openai_fallback_to_stub:
                     raise ServiceUnavailableError("AI provider request failed.") from exc
 
-        source_hint = f" Source: {payload.source_uri}." if payload.source_uri else ""
+        source_hint = " Uploaded media attached." if payload.source_uri else ""
         scene_profile = self._stub_scene_profile(payload.prompt)
         return (
             f"Processed {payload.media_type} input with {detections_count} detected scene elements. "

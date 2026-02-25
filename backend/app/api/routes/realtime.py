@@ -1,3 +1,4 @@
+import asyncio
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -67,6 +68,7 @@ async def _dispatch_inbound(websocket: WebSocket, message: RealtimeInboundMessag
         token_events = await streaming_service.stream_analysis(analyze_response.request_id, analyze_response.summary)
         for event in token_events:
             await manager.send_message(websocket, event)
+            await asyncio.sleep(0.04)
         await manager.send_message(
             websocket,
             RealtimeOutboundMessage(
@@ -86,6 +88,7 @@ async def _dispatch_inbound(websocket: WebSocket, message: RealtimeInboundMessag
     token_events = await streaming_service.stream_answer(question_response.request_id, question_response.answer)
     for event in token_events:
         await manager.send_message(websocket, event)
+        await asyncio.sleep(0.04)
     await manager.send_message(
         websocket,
         RealtimeOutboundMessage(

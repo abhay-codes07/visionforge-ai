@@ -1,3 +1,4 @@
+import asyncio
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
@@ -44,6 +45,7 @@ async def stream_vision_analysis(
         for idx, event in enumerate(events):
             chunk = VisionStreamChunk(request_id=analysis.request_id, token=event.content, index=idx)
             yield f"data: {chunk.model_dump_json()}\n\n"
+            await asyncio.sleep(0.04)
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
@@ -81,6 +83,7 @@ async def stream_vision_question(
         for idx, event in enumerate(events):
             chunk = VisionStreamChunk(request_id=answer.request_id, token=event.content, index=idx)
             yield f"data: {chunk.model_dump_json()}\n\n"
+            await asyncio.sleep(0.04)
         yield "data: [DONE]\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
