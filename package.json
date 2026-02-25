@@ -14,7 +14,8 @@
     "test:backend": "pytest backend/tests",
     "up": "docker compose -f docker/docker-compose.yml up -d --build",
     "down": "docker compose -f docker/docker-compose.yml down",
-    "logs": "docker compose -f docker/docker-compose.yml logs -f"
+    "logs": "docker compose -f docker/docker-compose.yml logs -f",
+    "smoke": "powershell -ExecutionPolicy Bypass -File scripts/smoke.ps1"
   },
   "engines": {
     "node": ">=20.0.0"
