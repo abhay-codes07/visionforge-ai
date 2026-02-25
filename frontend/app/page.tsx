@@ -1,4 +1,5 @@
 import { FeaturedSection } from "@/components/home/featured";
+import { FeaturesGridSection } from "@/components/home/features-grid";
 import { HeroSection } from "@/components/home/hero";
 import { HowItWorksSection } from "@/components/home/how-it-works";
 import { TestimonialsSection } from "@/components/home/testimonials";
@@ -10,6 +11,7 @@ export default function HomePage() {
       <Navbar />
       <HeroSection />
       <FeaturedSection />
+      <FeaturesGridSection />
       <HowItWorksSection />
       <TestimonialsSection />
     </main>
