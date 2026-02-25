@@ -46,6 +46,7 @@ export function AgentStudioSection() {
   }, []);
 
   const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setError(null);
     setSelectedFile(event.target.files?.[0] ?? null);
   };
 
@@ -185,7 +186,12 @@ export function AgentStudioSection() {
             </button>
             <p className="mt-3 min-h-16 text-sm text-cyan-100/85">{questionStream || "Waiting for answer stream..."}</p>
           </form>
-          {error && <div className="rounded-xl border border-rose-300/40 bg-rose-500/10 p-3 text-sm text-rose-100">{error}</div>}
+          {error && (
+            <div className="rounded-xl border border-rose-300/40 bg-rose-500/10 p-3 text-sm text-rose-100">
+              <p className="font-semibold">Vision Agent Error</p>
+              <p className="mt-1">{error}</p>
+            </div>
+          )}
         </div>
       </div>
     </Section>

@@ -34,6 +34,16 @@ export type SystemStatus = {
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000").replace(/\/+$/, "");
 const API_V1 = API_BASE.endsWith("/api/v1") ? API_BASE : `${API_BASE}/api/v1`;
 
+async function toApiError(response: Response, fallback: string): Promise<Error> {
+  try {
+    const payload = (await response.json()) as { error?: { message?: string } };
+    if (payload?.error?.message) return new Error(payload.error.message);
+  } catch {
+    // ignore parse errors
+  }
+  return new Error(`${fallback}: ${response.status}`);
+}
+
 export async function analyzeVision(payload: VisionAnalyzeRequest): Promise<VisionAnalyzeResponse> {
   const response = await fetch(`${API_V1}/vision/analyze`, {
     method: "POST",
@@ -41,7 +51,7 @@ export async function analyzeVision(payload: VisionAnalyzeRequest): Promise<Visi
     body: JSON.stringify(payload),
   });
   if (!response.ok) {
-    throw new Error(`Analyze request failed: ${response.status}`);
+    throw await toApiError(response, "Analyze request failed");
   }
   return response.json() as Promise<VisionAnalyzeResponse>;
 }
@@ -49,7 +59,7 @@ export async function analyzeVision(payload: VisionAnalyzeRequest): Promise<Visi
 export async function getVisionCapabilities(): Promise<VisionCapabilities> {
   const response = await fetch(`${API_V1}/vision/capabilities`);
   if (!response.ok) {
-    throw new Error(`Capabilities request failed: ${response.status}`);
+    throw await toApiError(response, "Capabilities request failed");
   }
   return response.json() as Promise<VisionCapabilities>;
 }
@@ -57,7 +67,7 @@ export async function getVisionCapabilities(): Promise<VisionCapabilities> {
 export async function getSystemStatus(): Promise<SystemStatus> {
   const response = await fetch(`${API_V1}/system/status`);
   if (!response.ok) {
-    throw new Error(`System status request failed: ${response.status}`);
+    throw await toApiError(response, "System status request failed");
   }
   return response.json() as Promise<SystemStatus>;
 }
@@ -71,7 +81,7 @@ export async function uploadMedia(file: File, mediaType: MediaType) {
     body: form,
   });
   if (!response.ok) {
-    throw new Error(`Upload request failed: ${response.status}`);
+    throw await toApiError(response, "Upload request failed");
   }
   return response.json();
 }
@@ -83,7 +93,7 @@ export async function streamAnalyzeVision(payload: VisionAnalyzeRequest, onToken
     body: JSON.stringify(payload),
   });
   if (!response.ok || !response.body) {
-    throw new Error(`Stream request failed: ${response.status}`);
+    throw await toApiError(response, "Stream request failed");
   }
 
   const reader = response.body.getReader();
@@ -123,7 +133,7 @@ export async function streamQuestionVision(
     body: JSON.stringify({ request_id: requestId, question }),
   });
   if (!response.ok || !response.body) {
-    throw new Error(`Question stream request failed: ${response.status}`);
+    throw await toApiError(response, "Question stream request failed");
   }
 
   const reader = response.body.getReader();

@@ -22,6 +22,7 @@ export function LiveAgentFeedSection() {
   const [prompt, setPrompt] = useState("Describe this live scene.");
   const [question, setQuestion] = useState("What is the main object?");
   const [mediaType, setMediaType] = useState<MediaType>("image");
+  const [uiError, setUiError] = useState<string | null>(null);
 
   const orderedEvents = useMemo(() => [...events].slice(-12).reverse(), [events]);
 
@@ -29,12 +30,16 @@ export function LiveAgentFeedSection() {
 
   const connect = () => {
     if (socketRef.current && connected) return;
+    setUiError(null);
     const socket = createVisionWebSocket();
     socketRef.current = socket;
 
     socket.onopen = () => setConnected(true);
     socket.onclose = () => setConnected(false);
-    socket.onerror = () => appendEvent({ type: "error", content: "WebSocket transport error." });
+    socket.onerror = () => {
+      setUiError("WebSocket transport error. Check backend connectivity.");
+      appendEvent({ type: "error", content: "WebSocket transport error." });
+    };
     socket.onmessage = (message) => {
       try {
         const parsed = JSON.parse(message.data) as FeedEvent;
@@ -52,17 +57,29 @@ export function LiveAgentFeedSection() {
   };
 
   const send = (payload: object) => {
-    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) return;
+    if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+      setUiError("Connect to realtime gateway before sending events.");
+      return;
+    }
+    setUiError(null);
     socketRef.current.send(JSON.stringify(payload));
   };
 
   const onAnalyze = (event: FormEvent) => {
     event.preventDefault();
+    if (!prompt.trim()) {
+      setUiError("Prompt cannot be empty.");
+      return;
+    }
     send({ type: "analyze", media_type: mediaType, prompt });
   };
 
   const onQuestion = (event: FormEvent) => {
     event.preventDefault();
+    if (!question.trim()) {
+      setUiError("Question cannot be empty.");
+      return;
+    }
     send({ type: "question", request_id: "ui-question", question });
   };
 
@@ -143,6 +160,7 @@ export function LiveAgentFeedSection() {
         <div className="glass-card rounded-2xl p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-white/50">Event Stream</p>
           <div className="mt-4 space-y-2">
+            {uiError && <p className="rounded-lg border border-rose-300/40 bg-rose-500/10 p-2 text-sm text-rose-100">{uiError}</p>}
             {orderedEvents.length === 0 && <p className="text-sm text-white/55">No events yet.</p>}
             {orderedEvents.map((event, idx) => (
               <div key={`${event.type}-${idx}`} className="rounded-lg border border-white/10 bg-black/20 p-3">
