@@ -12,3 +12,5 @@ def test_health_endpoint_returns_ok() -> None:
     payload = response.json()
     assert payload["status"] == "ok"
     assert payload["service"] == "visionary-agent-protocol-backend"
+    assert response.headers.get("X-API-Version") == "v1"
+    assert response.headers.get("Cache-Control") == "no-store"

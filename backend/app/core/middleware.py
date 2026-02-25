@@ -20,4 +20,7 @@ def register_middleware(app: FastAPI) -> None:
         response = await call_next(request)
         duration = time.perf_counter() - start_time
         response.headers["X-Process-Time"] = f"{duration:.4f}"
+        response.headers["X-API-Version"] = "v1"
+        if not request.url.path.endswith("/ws"):
+            response.headers["Cache-Control"] = "no-store"
         return response
