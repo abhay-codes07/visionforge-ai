@@ -1,0 +1,25 @@
+[project]
+name = "visionary-agent-protocol-backend"
+version = "0.1.0"
+description = "Backend services for Visionary Agent Protocol"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi==0.115.6",
+  "uvicorn[standard]==0.32.1",
+  "pydantic-settings==2.7.0",
+  "python-multipart==0.0.19",
+  "websockets==14.1",
+  "openai==1.57.0"
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest==8.3.4",
+  "httpx==0.28.1",
+  "ruff==0.8.4"
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
