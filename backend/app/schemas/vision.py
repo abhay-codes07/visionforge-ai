@@ -52,3 +52,9 @@ class VisionCapabilitiesResponse(BaseModel):
     supported_transports: list[str]
     supports_streaming: bool
     model: str
+
+
+class VisionStreamChunk(BaseModel):
+    request_id: str
+    token: str
+    index: int

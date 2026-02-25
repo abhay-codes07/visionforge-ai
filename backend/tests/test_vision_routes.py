@@ -56,3 +56,19 @@ def test_upload_route_returns_storage_metadata() -> None:
     assert payload["filename"] == "frame.jpg"
     assert payload["media_type"] == "image"
     assert payload["size_bytes"] == len(b"fake-image-bytes")
+
+
+def test_stream_analyze_route_returns_sse_chunks() -> None:
+    client = TestClient(app)
+
+    with client.stream(
+        "POST",
+        "/api/v1/vision/analyze/stream",
+        json={"media_type": "image", "prompt": "Stream scene reasoning"},
+    ) as response:
+        assert response.status_code == 200
+        body = "".join(response.iter_text())
+
+    assert "data: " in body
+    assert '"token"' in body
+    assert "[DONE]" in body

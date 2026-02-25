@@ -1,6 +1,7 @@
 from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
+from fastapi.responses import StreamingResponse
 
 from app.api.deps import get_vision_service
 from app.core.config import get_settings
@@ -10,13 +11,16 @@ from app.schemas.vision import (
     VisionCapabilitiesResponse,
     VisionQuestionRequest,
     VisionQuestionResponse,
+    VisionStreamChunk,
     VisionUploadResponse,
 )
 from app.services.storage_service import StorageService
+from app.services.streaming_service import StreamingService
 from app.services.vision_service import VisionService
 
 router = APIRouter(prefix="/vision")
 storage_service = StorageService()
+streaming_service = StreamingService()
 settings = get_settings()
 
 
@@ -26,6 +30,23 @@ async def analyze_vision(
     service: VisionService = Depends(get_vision_service),
 ) -> VisionAnalyzeResponse:
     return await service.analyze(payload)
+
+
+@router.post("/analyze/stream")
+async def stream_vision_analysis(
+    payload: VisionAnalyzeRequest,
+    service: VisionService = Depends(get_vision_service),
+) -> StreamingResponse:
+    analysis = await service.analyze(payload)
+    events = await streaming_service.stream_analysis(analysis.request_id, analysis.summary)
+
+    async def event_generator():
+        for idx, event in enumerate(events):
+            chunk = VisionStreamChunk(request_id=analysis.request_id, token=event.content, index=idx)
+            yield f"data: {chunk.model_dump_json()}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 
 @router.get("/capabilities", response_model=VisionCapabilitiesResponse)
