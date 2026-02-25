@@ -23,8 +23,8 @@ export type VisionCapabilities = {
   fallback_mode: boolean;
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
-const API_V1 = `${API_BASE}/api/v1`;
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000").replace(/\/+$/, "");
+const API_V1 = API_BASE.endsWith("/api/v1") ? API_BASE : `${API_BASE}/api/v1`;
 
 export async function analyzeVision(payload: VisionAnalyzeRequest): Promise<VisionAnalyzeResponse> {
   const response = await fetch(`${API_V1}/vision/analyze`, {
@@ -137,6 +137,6 @@ export async function streamQuestionVision(
 }
 
 export function createVisionWebSocket(): WebSocket {
-  const wsUrl = process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/api/v1/ws";
+  const wsUrl = (process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/api/v1/ws").replace(/\/+$/, "");
   return new WebSocket(wsUrl);
 }
