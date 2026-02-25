@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     openai_model: str = "gpt-4.1-mini"
     openai_enabled: bool = False
     openai_timeout_seconds: float = 30.0
+    openai_max_retries: int = 2
+    openai_retry_backoff_seconds: float = 0.75
     openai_fallback_to_stub: bool = True
     websocket_path: str = "/ws"
 
