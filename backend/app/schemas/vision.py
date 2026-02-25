@@ -35,3 +35,13 @@ class VisionQuestionResponse(BaseModel):
     request_id: str
     answer: str
     generated_at: datetime
+
+
+class VisionUploadResponse(BaseModel):
+    upload_id: str
+    filename: str
+    media_type: MediaType
+    content_type: str
+    size_bytes: int
+    storage_uri: str
+    uploaded_at: datetime

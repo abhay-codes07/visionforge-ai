@@ -16,6 +16,9 @@ __pycache__/
 # Logs
 *.log
 
+# Local media uploads
+tmp_uploads/
+
 # OS
 .DS_Store
 Thumbs.db
