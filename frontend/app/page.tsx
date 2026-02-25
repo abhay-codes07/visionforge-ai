@@ -1,3 +1,4 @@
+import { AgentStudioSection } from "@/components/home/agent-studio";
 import { FeaturedSection } from "@/components/home/featured";
 import { FeaturesGridSection } from "@/components/home/features-grid";
 import { FAQSection } from "@/components/home/faq";
@@ -15,6 +16,7 @@ export default function HomePage() {
       <Navbar />
       <HeroSection />
       <FeaturedSection />
+      <AgentStudioSection />
       <FeaturesGridSection />
       <HowItWorksSection />
       <MissionSection />
