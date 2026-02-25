@@ -67,6 +67,23 @@ async def ask_vision_question(
     return await service.answer_question(payload)
 
 
+@router.post("/question/stream")
+async def stream_vision_question(
+    payload: VisionQuestionRequest,
+    service: VisionService = Depends(get_vision_service),
+) -> StreamingResponse:
+    answer = await service.answer_question(payload)
+    events = await streaming_service.stream_answer(answer.request_id, answer.answer)
+
+    async def event_generator():
+        for idx, event in enumerate(events):
+            chunk = VisionStreamChunk(request_id=answer.request_id, token=event.content, index=idx)
+            yield f"data: {chunk.model_dump_json()}\n\n"
+        yield "data: [DONE]\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
+
 @router.post("/upload", response_model=VisionUploadResponse)
 async def upload_media(
     media_type: Literal["image", "video", "webcam"] = Form(...),

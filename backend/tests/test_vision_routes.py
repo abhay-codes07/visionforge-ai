@@ -72,3 +72,19 @@ def test_stream_analyze_route_returns_sse_chunks() -> None:
     assert "data: " in body
     assert '"token"' in body
     assert "[DONE]" in body
+
+
+def test_stream_question_route_returns_sse_chunks() -> None:
+    client = TestClient(app)
+
+    with client.stream(
+        "POST",
+        "/api/v1/vision/question/stream",
+        json={"request_id": "stream-q-1", "question": "What is visible in this scene?"},
+    ) as response:
+        assert response.status_code == 200
+        body = "".join(response.iter_text())
+
+    assert "data: " in body
+    assert '"request_id":"stream-q-1"' in body
+    assert "[DONE]" in body
