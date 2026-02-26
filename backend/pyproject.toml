@@ -10,7 +10,11 @@ dependencies = [
   "pydantic-settings==2.7.0",
   "python-multipart==0.0.19",
   "websockets==14.1",
-  "openai==1.57.0"
+  "openai==1.57.0",
+  "numpy==2.2.1",
+  "opencv-python-headless==4.10.0.84",
+  "ultralytics==8.3.58",
+  "vision-agents==0.3.5"
 ]
 
 [project.optional-dependencies]
