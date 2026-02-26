@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 
 from app.schemas.live import LiveDetection, LiveFrameAnalysis, LiveFramePayload
@@ -19,8 +20,42 @@ class LiveStreamService:
         self._yolo = YoloService()
         self._agent = VisionAgentService()
         self._sessions: dict[str, LiveSessionState] = {}
+        self._queues: dict[str, asyncio.Queue[tuple[LiveFramePayload, asyncio.Future[LiveFrameAnalysis]]]] = {}
+        self._workers: dict[str, asyncio.Task] = {}
+        self._queue_size = 4
 
     async def analyze_frame(self, payload: LiveFramePayload) -> LiveFrameAnalysis:
+        queue = self._queues.setdefault(payload.session_id, asyncio.Queue(maxsize=self._queue_size))
+        if payload.session_id not in self._workers:
+            self._workers[payload.session_id] = asyncio.create_task(self._worker(payload.session_id))
+
+        if queue.full():
+            try:
+                queue.get_nowait()
+                queue.task_done()
+            except asyncio.QueueEmpty:
+                pass
+
+        loop = asyncio.get_running_loop()
+        future: asyncio.Future[LiveFrameAnalysis] = loop.create_future()
+        await queue.put((payload, future))
+        return await future
+
+    async def _worker(self, session_id: str) -> None:
+        queue = self._queues[session_id]
+        while True:
+            payload, future = await queue.get()
+            try:
+                result = await self._analyze_now(payload)
+                if not future.cancelled():
+                    future.set_result(result)
+            except Exception as exc:  # pragma: no cover
+                if not future.cancelled():
+                    future.set_exception(exc)
+            finally:
+                queue.task_done()
+
+    async def _analyze_now(self, payload: LiveFramePayload) -> LiveFrameAnalysis:
         detections = self._yolo.detect_from_base64(payload.image_base64)
         reasoning = await self._agent.reason(
             prompt=payload.question or "Describe current scene state.",
