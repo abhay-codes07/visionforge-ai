@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 from datetime import UTC, datetime
 
+from app.core.config import get_settings
 from app.schemas.live import LiveDetection, LiveFrameAnalysis, LiveFramePayload
 from app.services.vision_agent_service import VisionAgentService
 from app.services.yolo_service import YoloService
@@ -17,12 +18,13 @@ class LiveSessionState:
 
 class LiveStreamService:
     def __init__(self) -> None:
+        settings = get_settings()
         self._yolo = YoloService()
         self._agent = VisionAgentService()
         self._sessions: dict[str, LiveSessionState] = {}
         self._queues: dict[str, asyncio.Queue[tuple[LiveFramePayload, asyncio.Future[LiveFrameAnalysis]]]] = {}
         self._workers: dict[str, asyncio.Task] = {}
-        self._queue_size = 4
+        self._queue_size = max(1, settings.live_frame_queue_size)
 
     async def analyze_frame(self, payload: LiveFramePayload) -> LiveFrameAnalysis:
         queue = self._queues.setdefault(payload.session_id, asyncio.Queue(maxsize=self._queue_size))
