@@ -9,6 +9,8 @@ services:
       - "3000:3000"
     env_file:
       - ../frontend/.env.local
+    environment:
+      HOSTNAME: "0.0.0.0"
     depends_on:
       backend:
         condition: service_healthy

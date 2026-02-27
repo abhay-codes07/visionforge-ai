@@ -12,7 +12,7 @@
     "lint:frontend": "npm --workspace frontend run lint",
     "test:frontend": "npm --workspace frontend run test",
     "dev:backend": "uvicorn app.main:app --reload --host 0.0.0.0 --port 8000 --app-dir backend",
-    "test:backend": "pytest backend/tests",
+    "test:backend": "python -m pytest backend/tests",
     "up": "docker compose -f docker/docker-compose.yml up -d --build",
     "down": "docker compose -f docker/docker-compose.yml down",
     "logs": "docker compose -f docker/docker-compose.yml logs -f",
