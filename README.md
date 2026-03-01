@@ -1,4 +1,4 @@
-# VisionForge AI
+# Visionary AI
 
 **Visionary Agent Protocol**  
 Real-time Vision AI infrastructure that watches live video, detects objects, reasons over context, and streams answers instantly.
@@ -20,9 +20,9 @@ Real-time Vision AI infrastructure that watches live video, detects objects, rea
 
 ---
 
-## What is VisionForge AI?
+## What is Visionary AI?
 
-VisionForge AI is a **real-time multimodal Vision Agent platform**.  
+Visionary AI is a **real-time multimodal Vision Agent platform**.  
 It ingests webcam/video/image inputs, runs live object detection, generates streaming reasoning, and supports live Q&A grounded in the current scene.
 
 It is built for hackathon demo velocity with production-oriented structure: modular services, typed contracts, WebSocket streaming, CI, and Dockerized deployment.
@@ -70,18 +70,18 @@ It is built for hackathon demo velocity with production-oriented structure: modu
 ```text
 visionforge-ai/
 +- frontend/
-¦  +- app/
-¦  +- components/
-¦  +- lib/
-¦  +- tests/
+Â¦  +- app/
+Â¦  +- components/
+Â¦  +- lib/
+Â¦  +- tests/
 +- backend/
-¦  +- app/
-¦  ¦  +- api/
-¦  ¦  +- core/
-¦  ¦  +- integrations/
-¦  ¦  +- schemas/
-¦  ¦  +- services/
-¦  +- tests/
+Â¦  +- app/
+Â¦  Â¦  +- api/
+Â¦  Â¦  +- core/
+Â¦  Â¦  +- integrations/
+Â¦  Â¦  +- schemas/
+Â¦  Â¦  +- services/
+Â¦  +- tests/
 +- docker/
 +- docs/
 +- .github/workflows/
@@ -292,4 +292,4 @@ MIT
 ## Maintainer
 
 **Abhay Codes07**  
-Repository: `abhay-codes07/visionforge-ai`
+Repository: `abhay-codes07/visionary-ai`
